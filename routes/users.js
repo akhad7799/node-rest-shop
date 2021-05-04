@@ -4,6 +4,7 @@ const {User, validate} = require('../modules/user');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
 router.post('/', async (req, res) => {
     const {error} = validate(req.body);
@@ -19,6 +20,11 @@ router.post('/', async (req, res) => {
     await user.save();
     res.send(_.pick(user, ['name', 'email', 'isAdmin']));
 });
+
+router.get('/', [auth, admin], async (req, res) => {
+    const user = await User.find().sort('name').select('-password');
+    res.send(user);
+})
 
 router.get('/me', auth, async (req, res)=>{
     const user = await User.findById(req.user._id).select('-password');

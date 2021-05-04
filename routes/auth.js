@@ -4,6 +4,7 @@ const router = express.Router();
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
+const nodemailer = require('nodemailer');
 
 router.post('/', async (req, res)=> {
     const { error } = validate(req.body);
@@ -14,8 +15,32 @@ router.post('/', async (req, res)=> {
         return res.status(400).send('Invalid email or password.');
     }
     const isValidPassword = await bcrypt.compare(req.body.password, user.password);
-    if(!isValidPassword)
+    if(!isValidPassword) {
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'sevmasdim@gmail.com',
+                pass: 'jhjfrldovemcknzp'
+            }
+        });
+
+        let mailOptions = {
+            from: 'sevmasdim@gmail.com',
+            to: req.body.email,
+            subject: 'Node-rest-shop LogIn',
+            text: 'Attempted to login your profile!!!'
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response)
+            }
+        });
         return res.status(400).send('Invalid email or password.');
+
+    }
 
     // const token = jwt.sign({_id: user._id}, config.get('jwtPrivateKey'));
     const token = user.generateAuthToken();

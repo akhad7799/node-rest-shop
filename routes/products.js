@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {Product, validate} = require('../modules/product');
+const {Product, validate} = require('../models/product');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 
@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     res.send(products);
 });
 
-router.post('/', [auth, admin], async (req, res) => {
+router.post('/',  async (req, res) => {
     const {error} = validate(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);

@@ -1,15 +1,15 @@
-const {Order, validate} = require('../modules/order');
-const {Product} = require('../modules/product');
+const {Order, validate} = require('../models/order');
+const {Product} = require('../models/product');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
     const orders = await Order.find().sort('quantity');
     res.send(orders);
 });
 
-router.post('/', auth,  async (req,res) => {
+router.post('/', async (req,res) => {
     const {error} = validate(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);
